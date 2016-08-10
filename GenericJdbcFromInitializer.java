@@ -40,7 +40,7 @@ import org.apache.sqoop.utils.ClassUtils;
 
 public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, FromJobConfiguration> {
 
-  private static final Logger LOG =
+  private static final java.util.logging.Logger LOG =
     Logger.getLogger(GenericJdbcFromInitializer.class);
 
   private GenericJdbcExecutor executor;
@@ -193,8 +193,6 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
         }
       }
     }
-    String countQuery=null;
-    if(countQuer)
     // Retrieving min and max values for partition column
     String minMaxQuery = jobConf.fromJobConfig.boundaryQuery;
     if (minMaxQuery == null) {
@@ -202,6 +200,9 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
       sb.append("SELECT ");
       sb.append("MIN(").append(partitionColumnName).append("), ");
       sb.append("MAX(").append(partitionColumnName).append(") ");
+      ////////////
+      sb.append("COUNT(").append(partitionColumnName).append(") ");
+      ///////////
       sb.append("FROM ").append(fromFragment).append(" ");
 
       if(incrementalImport) {
@@ -213,7 +214,7 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
 
       minMaxQuery = sb.toString();
     }
-    LOG.info("Using min/max query: " + minMaxQuery);
+    LOG.info("Using min/max/Count query: " + minMaxQuery);
 
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -232,7 +233,9 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
       // Boundaries for the job
       String min = rs.getString(1);
       String max = rs.getString(2);
-
+      ////////
+      String count=rs.getString(3);
+////////////
       // Type of the partition column
       ResultSetMetaData rsmd = rs.getMetaData();
       if (rsmd.getColumnCount() != 2) {
@@ -245,6 +248,9 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
       context.setInteger(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COLUMNTYPE, columnType);
       context.setString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MINVALUE, min);
       context.setString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MAXVALUE, max);
+      //////
+      context.setString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COUNTVALUE, count);
+      ///////////
     } finally {
       if(ps != null) {
         ps.close();

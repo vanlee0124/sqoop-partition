@@ -45,6 +45,9 @@ public class GenericJdbcPartitioner extends Partitioner<LinkConfiguration, FromJ
   private int partitionColumnType;
   private String partitionMinValue;
   private String partitionMaxValue;
+  /////
+  private String partitionCountValue;
+  ///////
   private Boolean allowNullValueInPartitionColumn;
 
   @Override
@@ -57,7 +60,9 @@ public class GenericJdbcPartitioner extends Partitioner<LinkConfiguration, FromJ
     partitionColumnType = context.getInt(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COLUMNTYPE, -1);
     partitionMinValue = context.getString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MINVALUE);
     partitionMaxValue = context.getString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MAXVALUE);
-
+    //////
+    partitionCountValue = context.getString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COUNTVALUE);
+    ///////////
     allowNullValueInPartitionColumn = fromJobConfig.fromJobConfig.allowNullValueInPartitionColumn;
     if (allowNullValueInPartitionColumn == null) {
       allowNullValueInPartitionColumn = false;
