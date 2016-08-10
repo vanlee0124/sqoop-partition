@@ -46,10 +46,10 @@ public class GenericJdbcPartitioner extends Partitioner<LinkConfiguration, FromJ
   private String partitionMinValue;
   private String partitionMaxValue;
   /////
-  private String partitionCountValue;
+  private long partitionCountValue;
   ///////
   private Boolean allowNullValueInPartitionColumn;
-
+  
   @Override
   public List<Partition> getPartitions(PartitionerContext context, LinkConfiguration linkConfig,
       FromJobConfiguration fromJobConfig) {
@@ -61,7 +61,8 @@ public class GenericJdbcPartitioner extends Partitioner<LinkConfiguration, FromJ
     partitionMinValue = context.getString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MINVALUE);
     partitionMaxValue = context.getString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MAXVALUE);
     //////
-    partitionCountValue = context.getString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COUNTVALUE);
+    partitionCountValue = context.getLong(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COUNTVALUE,0);
+    this.partitionNumbersMotifier();
     ///////////
     allowNullValueInPartitionColumn = fromJobConfig.fromJobConfig.allowNullValueInPartitionColumn;
     if (allowNullValueInPartitionColumn == null) {
@@ -131,7 +132,27 @@ public class GenericJdbcPartitioner extends Partitioner<LinkConfiguration, FromJ
 
     return partitions;
   }
+ protected void partitionNumbersMotifier()
+ {
+	 if(partitionCountValue<10000)
+	 {
+		 numberPartitions=1;
+		 return ;
+	 }
+	 if(this.partitionCountValue<100000)
+	 {
+		 this.numberPartitions=2;
+		 return;
+	 }
+	 if(this.partitionCountValue<8000000)
+	 {
+		 this.numberPartitions=4;
+		 return;
+	 }
+	 
+	 this.numberPartitions= Math.min(20, this.partitionCountValue/2000000);
 
+ }
   protected List<Partition> partitionDateTimeColumn() {
     List<Partition> partitions = new LinkedList<Partition>();
 
