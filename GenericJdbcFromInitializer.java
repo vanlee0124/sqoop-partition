@@ -234,7 +234,7 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
       String min = rs.getString(1);
       String max = rs.getString(2);
       ////////
-      String count=rs.getString(3);
+      Long count=rs.getLong(3);
 ////////////
       // Type of the partition column
       ResultSetMetaData rsmd = rs.getMetaData();
@@ -249,7 +249,7 @@ public class GenericJdbcFromInitializer extends Initializer<LinkConfiguration, F
       context.setString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MINVALUE, min);
       context.setString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_MAXVALUE, max);
       //////
-      context.setString(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COUNTVALUE, count);
+      context.setLong(GenericJdbcConnectorConstants.CONNECTOR_JDBC_PARTITION_COUNTVALUE, count);
       ///////////
     } finally {
       if(ps != null) {
